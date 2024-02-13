@@ -9,7 +9,7 @@ rule phase_vcf_file:
     conda: "../Envs/shapeit5_env.yaml"
     shell:
         """
-            shapeit5 phase_common \
+            SHAPEIT5_phase_common \
             --input {input.vcf} \
             --map {input.input_map} \
             --region 19 \
