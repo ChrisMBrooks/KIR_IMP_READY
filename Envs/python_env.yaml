@@ -1,0 +1,6 @@
+name: python_env
+channels:
+  - defaults
+dependencies:
+  - pandas>=1.4
+  - requests>=2.27

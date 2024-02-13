@@ -1,0 +1,4 @@
+.snakemake
+.Output
+pipeline.config.json
+.DS_Store

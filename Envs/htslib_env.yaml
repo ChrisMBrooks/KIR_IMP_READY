@@ -1,0 +1,7 @@
+name: htslib_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - htslib=1.3

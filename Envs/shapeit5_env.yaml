@@ -1,0 +1,6 @@
+name: shapeit5_env
+channels:
+  - defaults
+  - bioconda
+dependencies:
+  - shapeit5

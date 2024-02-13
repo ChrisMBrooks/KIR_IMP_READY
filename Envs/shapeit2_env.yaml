@@ -1,0 +1,10 @@
+name: shapeit2_env
+channels:
+  - dranew
+  - defaults
+  - bioconda
+  - conda-forge
+dependencies:
+  - cxx-compiler
+  - bzip2=1.0.8
+  - shapeit
