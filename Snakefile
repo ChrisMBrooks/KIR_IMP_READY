@@ -25,7 +25,7 @@ PARTITION_IDS = range(1, NUM_PARTITIONS+1,1)
 rule kir_imp_ready:
     input:
         hap_file = expand(
-            "Output/{project}/KIR_IMP_READY/{filename}.chr19.53_to_56mb.ac.phased.{partition_id}.hap"
+            "Output/{project}/KIR_IMP_READY/{filename}.chr19.53_to_56mb.ac.phased.{partition_id}.hap",
             project = PROJECT,
             filename = FILENAME,
             partition_id=PARTITION_IDS
