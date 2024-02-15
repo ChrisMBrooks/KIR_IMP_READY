@@ -1,6 +1,7 @@
 # snakemake --cores 8 --use-conda --conda-frontend conda --rerun-incomplete --until "extract_list_of_sample_ids"
 # snakemake --cores 8 --use-conda --conda-frontend conda --rerun-incomplete
 # snakemake --cores 8 --use-conda --conda-frontend conda --dry-run
+# snakemake --cores 8 --use-conda --conda-frontend conda --keep-incomplete
 #--printshellcmds
 
 import json, os, sys
@@ -24,13 +25,13 @@ PARTITION_IDS = range(1, NUM_PARTITIONS+1,1)
 rule kir_imp_ready:
     input:
         hap_file = expand(
-            "Output/{project}/KIR_IMP_READY/{filename}.chr19.53_to_56mb.dose.{partition_id}.hap.gz",
+            "Output/{project}/KIR_IMP_READY/{filename}.chr19.53_to_56mb.ac.dose.{partition_id}.hap.gz",
             project = PROJECT,
             filename = FILENAME,
             partition_id=PARTITION_IDS
         ),
         samp_file = expand(
-            "Output/{project}/KIR_IMP_READY/{filename}.chr19.53_to_56mb.dose.{partition_id}.sample",
+            "Output/{project}/KIR_IMP_READY/{filename}.chr19.53_to_56mb.ac.dose.{partition_id}.sample",
             project = PROJECT,
             filename = FILENAME,
             partition_id=PARTITION_IDS
@@ -39,7 +40,7 @@ rule kir_imp_ready:
 include: "Rules/LiftOver/conditional_lifover.smk"
 include: "Rules/extract_kir_loci_convert_to_vcf.smk"
 include: "Rules/phase_vcf_file.smk"
-include: "Rules/compress_and_index_vcf.smk"
+include: "Rules/convert_and_compress.smk"
 include: "Rules/extract_list_of_sample_ids.smk"
 include: "Rules/split_sample_ids_file.smk"
 include: "Rules/partition_vcf_file.smk"

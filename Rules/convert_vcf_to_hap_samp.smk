@@ -1,13 +1,12 @@
 rule convert_vcf_to_hap_samp:
     input:
-        phased_vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.dose.{partition_id}.vcf.gz",
+        phased_vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.{partition_id}.vcf.gz",
         snps_reference = "Output/{project}/MetaData/kirimp3.all.snps.txt"
     params:
-        vcf_prefix = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.dose.{partition_id}",
-        hap_samp_prefix = "Output/{project}/KIR_IMP_READY/{filename}.chr19.53_to_56mb.dose.{partition_id}"
+        vcf_prefix = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.{partition_id}",
     output:
-        hap = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.dose.{partition_id}.hap.gz",
-        samp = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.dose.{partition_id}.sample"
+        hap = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.{partition_id}.hap.gz",
+        samp = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.{partition_id}.sample"
     conda: "../Envs/bcftools_env.yaml"
     shell:
         """
