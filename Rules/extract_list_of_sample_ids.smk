@@ -1,6 +1,6 @@
 rule extract_list_of_sample_ids:
     input:
-        vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.vcf.gz"
+        vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.phased.vcf.gz"
     output:
         sample_ids = "Output/{project}/MetaData/{filename}.sample_ids.txt"
     conda: "../Envs/bcftools_env.yaml"

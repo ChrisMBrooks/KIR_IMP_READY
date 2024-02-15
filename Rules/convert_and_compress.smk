@@ -1,8 +1,8 @@
 rule convert_and_compress:
     input:
-        phased_bcf = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.bcf"
+        phased_bcf = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.phased.bcf"
     output:
-        phased_vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.vcf.gz"
+        phased_vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.phased.vcf.gz"
     conda: "../Envs/bcftools_env.yaml"
     shell:
         """

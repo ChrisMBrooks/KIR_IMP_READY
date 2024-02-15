@@ -2,11 +2,11 @@ rule phase_vcf_file:
     input:
         vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.vcf.gz",
         index1 = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.vcf.gz.csi",
-        input_map = "ReferenceData/chr19.b37.gmap.gz"
+        input_map = "ReferenceData/genetic_maps.b37.tar.gz"
     output:
-        tmp_output = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose.bcf",
+        bcf = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.phased.bcf",
     params:
-        filename_prefix = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.dose"
+        filename_prefix = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.phased"
     conda: "../Envs/shapeit5_env.yaml"
     shell:
         """
@@ -14,7 +14,7 @@ rule phase_vcf_file:
             --input {input.vcfgz} \
             --map {input.input_map} \
             --region 19 \
-            --output {output.tmp_output} \
+            --output {output.bcf} \
             --filter-snp \
             --thread 8
         """
