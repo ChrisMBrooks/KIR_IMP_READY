@@ -1,0 +1,16 @@
+{
+    "project":"KIR_IMP_READY_TEST",
+    "bed_bim_fam_filename":"Input/MY_SNP_INPUT_FILE.chr19",
+    "bed_bim_fam_hg_build":"hg18",
+    "num_data_partitions":2,
+    "snp_ref_panel_url":"https://imp.science.unimelb.edu.au/kir/static/kirimp.uk1.snp.info.csv",
+    "lift_over_config":{
+        "ucsc_ref_map_urls": {
+                "hg38_to_hg19" : "http://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToHg19.over.chain.gz", 
+                "hg18_to_hg19" : "http://hgdownload.soe.ucsc.edu/goldenPath/hg18/liftOver/hg18ToHg19.over.chain.gz", 
+                "hg17_to_hg19" : "https://hgdownload.soe.ucsc.edu/goldenPath/hg17/liftOver/hg17ToHg19.over.chain.gz",
+                "hg16_to_hg19" : "https://hgdownload.soe.ucsc.edu/goldenPath/hg16/liftOver/hg16ToHg19.over.chain.gz"
+        }
+    }
+
+}
