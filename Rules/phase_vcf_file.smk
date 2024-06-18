@@ -2,7 +2,7 @@ rule phase_vcf_file:
     input:
         vcfgz = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.vcf.gz",
         index1 = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.vcf.gz.csi",
-        input_map = "ReferenceData/genetic_maps.b37.tar.gz"
+        input_map = "ReferenceData/chr19.b37.gmap.gz"
     output:
         bcf = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.phased.bcf",
     params:

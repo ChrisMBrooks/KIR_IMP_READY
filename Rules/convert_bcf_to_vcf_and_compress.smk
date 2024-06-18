@@ -1,4 +1,4 @@
-rule convert_and_compress:
+rule convert_bcf_to_vcf_and_compress:
     input:
         phased_bcf = "Output/{project}/VCF/{filename}.chr19.53_to_56mb.ac.phased.bcf"
     output:

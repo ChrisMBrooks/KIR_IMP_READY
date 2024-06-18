@@ -38,7 +38,7 @@ def main():
     snp_panel["chromosome"] = 19
 
     snp_panel = snp_panel[["chromosome", "position"]]
-    snp_panel.to_csv(output_filename, header=None, index=None, sep="\t")
+    snp_panel.to_csv(output_filename, header=None, index=None, sep="	")
     
     print('Complete.')    
 

@@ -177,5 +177,6 @@ else:
                 plink --file {params.map_prefix} \
                 --make-bed \
                 --tab \
-                --out {params.bed_prefix}
+                --out {params.bed_prefix} \
+                --allow-extra-chr
             """

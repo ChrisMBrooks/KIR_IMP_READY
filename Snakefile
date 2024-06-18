@@ -1,8 +1,6 @@
-# snakemake --cores 8 --use-conda --conda-frontend conda --rerun-incomplete --until "extract_list_of_sample_ids"
 # snakemake --cores 8 --use-conda --conda-frontend conda --rerun-incomplete
-# snakemake --cores 8 --use-conda --conda-frontend conda --dry-run
+# snakemake --cores 8 --use-conda --conda-frontend conda --dry-run --printshellcmds
 # snakemake --cores 8 --use-conda --conda-frontend conda --keep-incomplete
-#--printshellcmds
 
 import json, os, sys
 def load_pipeline_config():
@@ -40,7 +38,7 @@ rule kir_imp_ready:
 include: "Rules/LiftOver/conditional_lifover.smk"
 include: "Rules/extract_kir_loci_convert_to_vcf.smk"
 include: "Rules/phase_vcf_file.smk"
-include: "Rules/convert_and_compress.smk"
+include: "Rules/convert_bcf_to_vcf_and_compress.smk"
 include: "Rules/extract_list_of_sample_ids.smk"
 include: "Rules/split_sample_ids_file.smk"
 include: "Rules/partition_vcf_file.smk"
