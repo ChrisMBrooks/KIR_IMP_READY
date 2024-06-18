@@ -1,5 +1,5 @@
-# HLA_IMP_READY
-## _A Snakemake Pipeline to Prepare SNP Microarray data for use with [KIR*IMP3](https://imp.science.unimelb.edu.au/kir/)_
+# KIR_IMP_READY
+## _A Snakemake Pipeline to Prepare SNP Microarray data for use with [KIR*IMP](https://imp.science.unimelb.edu.au/kir/)_
 
 ## Authors
 * Christopher Michael Brooks ([@chrismbrooks](https://github.com/chrismbrooks))
@@ -43,13 +43,13 @@ Two main input files must be configured or be made available before the pipeline
 
 The ``pipeline.config.json`` file is a simple high level JSON file containing configuration settings and metadata. The following key-item pairs are required: 
 
-* ``project`` is an input string, and represents the project name to be used by snakemake, e.g. ``HLA_IMP_READY_TEST``. 
+* ``project`` is an input string, and represents the project name to be used by snakemake, e.g. ``KIR_IMP_READY_TEST``. 
 
 * ``bed_bim_fam_filename`` is the filepath location to the ``.bed / .bim / .fam`` files. All files must have the same filename. The text in the JSON attribute should include the directory path and the filename, but not the file extension. 
 
-* ``bed_bim_fam_hg_build`` is the reference genome used when constructing the ``.bed / .bim / .fam`` files. The following builds are supported: hg38, hg16, hg17, hg18 & hg19. HLA*IMP requires hg19 so all files will be lifted over to this reference genome.   
+* ``bed_bim_fam_hg_build`` is the reference genome used when constructing the ``.bed / .bim / .fam`` files. The following builds are supported: hg38, hg16, hg17, hg18 & hg19. KIR*IMP requires hg19 so all files will be lifted over to this reference genome.   
 
-* ``num_data_partitions`` is the number of files to segment the HLA\*IMP input file into. HLA\*IMP Required Oxford HAPS/SAMPLE files of less than 100MB, so it is likely necessary to partition the data into two or more input files. 
+* ``num_data_partitions`` is the number of files to segment the KIR\*IMP input file into. KIR\*IMP Required Oxford HAPS/SAMPLE files of less than 100MB, so it is likely necessary to partition the data into two or more input files. 
 
 # Run
 TBD, TBD, TBD
@@ -65,11 +65,11 @@ snakemake --cores 8 --use-conda --conda-frontend conda --keep-going
 
 # Output
 
-The phased Hap/Samp files for each of N partitions are output into the ``Output/Liechti2023/HLA_IMP_READY``, e.g.:
+The phased Hap/Samp files for each of N partitions are output into the ``Output/Liechti2023/KIR_IMP_READY``, e.g.:
 
 * TBD
 * TBD
 
 # Afterward
 
-To obtain imputation results, individually upload each of the Hap/Sam pairs to the [HLA*IMP3 Jobs Page](https://imp.science.unimelb.edu.au/kir/jobs). You will need to register and create an account. Upon completion of the HLA imputation you will receive a confirmation email and ``acces key``. Results can be downloaded from the same Jobs Page. 
+To obtain imputation results, individually upload each of the Hap/Sam pairs to the [KIR*IMP Jobs Page](https://imp.science.unimelb.edu.au/kir/jobs). You will need to register and create an account. Upon completion of the KIR imputation you will receive a confirmation email and ``acces key``. Results can be downloaded from the same Jobs Page. 
