@@ -81,8 +81,6 @@ The ``pipeline.config.json`` file is a simple high level JSON file containing co
         "outlier_threshold":0.1
     }
 }
-
-}
 ```
 
 # Run
