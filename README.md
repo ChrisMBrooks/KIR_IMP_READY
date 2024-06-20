@@ -57,7 +57,7 @@ The ``pipeline.config.json`` file is a simple high level JSON file containing co
 
 * ``max_ambigious_threshold`` is the upper bound threshold for frequency enconding. Frequencies below this threshold are deemed ambiguous and will not be flipped if necessitated by the reference panel, the deault value is 0.505. SNPs which require flipping but that are deemed ambiguous are dropped from the file.
 
-* ``outlier_threshold`` SNPS whose frequency falls outside this threshold will be dropped from the file. The default value is 0.1. 
+* ``outlier_threshold`` is CURRENTLY NOT IMPLEMENTED.
 
 ```json
 {
