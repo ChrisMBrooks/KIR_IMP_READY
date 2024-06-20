@@ -8,7 +8,7 @@ import sample_genotype as smpgeno
 import variant_wrapper as vw
 import fes_constants as CONST
 
-def parse_arguments():
+def parse_arguments() -> dict:
 
     parser = argparse.ArgumentParser(
         description="A script that encodes SNPs in a VCF to a reference panel based on allele frequencies. v2.0.",
@@ -116,7 +116,7 @@ def parse_arguments():
 
     return vars(parser.parse_args())
 
-def augment_vcf_header(vcf):
+def augment_vcf_header(vcf) -> VCF:
     vcf.add_info_to_header(CONST.VCF_INFO_UPDATED)
     vcf.add_info_to_header(CONST.VCF_INFO_PANEL_FREQ_DIFF)
     vcf.add_info_to_header(CONST.VCF_INFO_MISSINGNES)
@@ -126,7 +126,7 @@ def augment_vcf_header(vcf):
     
     return vcf
 
-def swap_variant_ref_and_alt(variant):
+def swap_variant_ref_and_alt(variant) -> Variant:
     sample_genotype_details = variant.genotypes
     sample_genotypes = \
         [smpgeno.SampleGenotype(record) for record in sample_genotype_details]
@@ -151,7 +151,7 @@ def flip_variant_strand(
     variant:Variant, 
     snp_reference:snpr.SNPReference, 
     bp_complements=CONST.BP_COMPLEMENTS
-):
+) -> Variant:
     variant.REF = bp_complements[variant.REF]
     variant.ALT = bp_complements[variant.ALT[0]]
     
@@ -167,7 +167,7 @@ def variant_is_ambiguous(
         drop_ambiguous_flag:bool, 
         min_ambigious_threshold, 
         max_ambigious_threshold
-):
+) -> bool:
     condition1 = float(wrapped_variant.variant.aaf) > float(min_ambigious_threshold)
     condition2 = float(wrapped_variant.variant.aaf) < float(max_ambigious_threshold)
     condition3 = drop_ambiguous_flag
@@ -303,13 +303,13 @@ def augment_revised_variant(wrapped_variant:vw.VariantWrapper, panel_entry:snpr.
 
     return wrapped_variant, revision_record
 
-def export_revised_vcf(variants:list, vcf_template, output_filename:str):
+def export_revised_vcf(variants:list, vcf_template, output_filename:str) -> None:
     w = Writer(output_filename, vcf_template)
     for wrapped_variant in variants:
         w.write_record(wrapped_variant.variant)
     w.close()
 
-def format_revision_record(wrapped_variant, panel_entry):
+def format_revision_record(wrapped_variant, panel_entry) -> dict:
     revision_record = {
         "variant_id": wrapped_variant.variant.ID,
         "chromosome":wrapped_variant.variant.CHROM, 
@@ -344,7 +344,7 @@ def format_revision_record(wrapped_variant, panel_entry):
 
     return revision_record
 
-def main():
+def main() -> None:
     print("Starting...")
 
     # Parse Inputs
