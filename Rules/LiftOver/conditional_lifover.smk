@@ -1,6 +1,7 @@
 if CONFIG["bed_bim_fam_hg_build"].lower() == 'hg19':
     rule skip_liftover:
         input:
+            config_file = CONFIG_FILENAME,
             bim = "{fp_filename}.bim".format(fp_filename=FULL_PATH_FILENAME),
             bed = "{fp_filename}.bed".format(fp_filename=FULL_PATH_FILENAME),
             fam = "{fp_filename}.fam".format(fp_filename=FULL_PATH_FILENAME)
@@ -23,6 +24,7 @@ else:
 
     rule convert_bed_to_map:
         input:
+            config_file = CONFIG_FILENAME,
             bim = "{fp_filename}.bim".format(fp_filename=FULL_PATH_FILENAME),
             bed = "{fp_filename}.bed".format(fp_filename=FULL_PATH_FILENAME),
             fam = "{fp_filename}.fam".format(fp_filename=FULL_PATH_FILENAME)

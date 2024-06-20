@@ -11,6 +11,11 @@
                 "hg17_to_hg19" : "https://hgdownload.soe.ucsc.edu/goldenPath/hg17/liftOver/hg17ToHg19.over.chain.gz",
                 "hg16_to_hg19" : "https://hgdownload.soe.ucsc.edu/goldenPath/hg16/liftOver/hg16ToHg19.over.chain.gz"
         }
+    },
+    "freq_encode_snps_config":{
+        "panel_chromosome": 19,
+        "min_ambigious_threshold": 0.495,
+        "max_ambigious_threshold": 0.505,
+        "outlier_threshold":0.1
     }
-
 }

@@ -1,0 +1,10 @@
+name: frequency_encode_snps_env
+channels: 
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - cyvcf2
+  - bcftools
+  - matplotlib
+  - pandas
