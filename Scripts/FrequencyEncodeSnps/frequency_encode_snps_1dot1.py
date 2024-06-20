@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 
 from cyvcf2 import VCF, Writer, Variant
-from snp_reference import SNPReference as snpr
-from sample_genotype import SampleGenotype as smpgeno
-from variant_wrapper import VariantWrapper as vw
-from fes_constants import Constants as CONST
+import snp_reference as snpr
+import sample_genotype as smpgeno
+import variant_wrapper as vw
+import fes_constants as CONST
 
 def parse_arguments():
 
@@ -332,7 +332,7 @@ def main():
     input_vcf_filename = args["InputVCF"]
     output_dir = args["OutputDir"]
     output_vcf_filename = os.path.join(output_dir, args["OutputVCF"])
-    revision_summary_filename = "/Volumes/cmb22/home/RA/cyvcf2/Output/frq_encoding_changes_summary.csv"
+    revision_summary_filename = "frq_encoding_changes_summary.csv"
     revision_summary_filename = os.path.join(output_dir, revision_summary_filename)
     summary_plot_filename = "freq_encode_snps_summary_plot.png"
     summary_plot_filename = os.path.join(output_dir, summary_plot_filename)

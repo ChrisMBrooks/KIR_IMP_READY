@@ -30,7 +30,7 @@ rule frequency_encode_snps:
             --AmbiguousThresholdMax {params.max_ambigious_threshold} \
             --FixComplementRefAlt \
             --DropEncodingFailures \
-            --OutlierThreshold {params.outlier_threshold}
+            --OutlierThreshold {params.outlier_threshold} \
 
             bcftools index -f {output.vcfgz}
         """
