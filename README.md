@@ -51,6 +51,14 @@ The ``pipeline.config.json`` file is a simple high level JSON file containing co
 
 * ``num_data_partitions`` is the number of files to segment the KIR\*IMP input file into. KIR\*IMP Required Oxford HAPS/SAMPLE files of less than 100MB, so it is likely necessary to partition the data into two or more input files. 
 
+* ``panel_chromosome`` is the chromosome of the reference panel, should always be 19.
+
+* ``min_ambigious_threshold`` is the lower bound threshold for frequency encoding. Frequencies above this threshold are deemed ambiguous and will not be flipped if necessitated by the reference panel, default is 0.495. SNPs which require flipping but that are deemed ambiguous are dropped from the file.
+
+* ``max_ambigious_threshold`` is the upper bound threshold for frequency enconding. Frequencies below this threshold are deemed ambiguous and will not be flipped if necessitated by the reference panel, the deault value is 0.505. SNPs which require flipping but that are deemed ambiguous are dropped from the file.
+
+* ``outlier_threshold`` SNPS whose frequency falls outside this threshold will be dropped from the file. The default value is 0.1. 
+
 ```json
 {
     "project":"KIR_IMP_READY_TEST",
@@ -65,7 +73,14 @@ The ``pipeline.config.json`` file is a simple high level JSON file containing co
                 "hg17_to_hg19" : "https://hgdownload.soe.ucsc.edu/goldenPath/hg17/liftOver/hg17ToHg19.over.chain.gz",
                 "hg16_to_hg19" : "https://hgdownload.soe.ucsc.edu/goldenPath/hg16/liftOver/hg16ToHg19.over.chain.gz"
         }
+    },
+    "freq_encode_snps_config":{
+        "panel_chromosome": 19,
+        "min_ambigious_threshold": 0.495,
+        "max_ambigious_threshold": 0.505,
+        "outlier_threshold":0.1
     }
+}
 
 }
 ```
