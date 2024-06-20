@@ -70,7 +70,7 @@ def parse_arguments():
         "-a",
         "--DropAmbiguous",
         help="Behaviour Flat: drop ambiguous alleles from output VCF.",
-        action="store_false",
+        action="store_true",
     )
 
     optional.add_argument(
@@ -95,14 +95,14 @@ def parse_arguments():
         "-c",
         "--FixComplementRefAlt",
         help="Behaviour Flag: should ref/alt that are complements be fixed with respect to frequency.",
-        action="store_false",
+        action="store_true",
     )
 
     optional.add_argument(
         "-e",
         "--DropEncodingFailures",
         help="Behaviour Flag: drop any variants which cannot be correctly encoded to the reference panel.",
-        action="store_false",
+        action="store_true",
     )
 
     optional.add_argument(
@@ -145,6 +145,8 @@ def swap_variant_ref_and_alt(variant):
     variant.ALT = [temp_nuc]
     variant.INFO["AF"] = updated_frequency
 
+    return variant
+
 def flip_variant_strand(
     variant:Variant, 
     snp_reference:snpr.SNPReference, 
@@ -156,7 +158,9 @@ def flip_variant_strand(
     frequency_synced = snp_reference.frequencies_synced(variant)
 
     if not frequency_synced:
-        swap_variant_ref_and_alt(variant)
+        variant = swap_variant_ref_and_alt(variant)
+    
+    return variant
 
 def variant_is_ambiguous(
         wrapped_variant:vw.VariantWrapper, 
@@ -198,19 +202,20 @@ def encode_variants_to_panel(
             )
 
             if  wrapped_variant.key in panel:
+                panel_entry = panel[wrapped_variant.key]
                 wrapped_variant.in_ref_panel = True
                 variant_summary_stats["variant_in_panel"] += 1
 
-                # CHECK FOR NULL ALT 
+                # CHECK FOR NULL ALT, IF NULL THEN SKIP 
                 if not wrapped_variant.variant.ALT:
                     wrapped_variant.status = "removed"
                     wrapped_variant.reason = "Unknown ALT allele."
-                    excluded_wrapped_variants.append(wrapped_variant)
+                    excluded_wrapped_variants.append((wrapped_variant, panel_entry))
                     variant_summary_stats["unknown_alt"] += 1
                     variant_summary_stats["variant_removed_from_panel"] += 1
                     continue
                 
-                # CHECK IF AMBIGUOUS 
+                # CHECK IF AMBIGUOUS, IF AMBIGUOUS THEN SKIP
                 ambiguous_condition = variant_is_ambiguous(
                     wrapped_variant=wrapped_variant, 
                     drop_ambiguous_flag=drop_ambiguous_settings["drop_ambiguous_flag"], 
@@ -220,47 +225,41 @@ def encode_variants_to_panel(
                 if ambiguous_condition:
                     wrapped_variant.status = "removed"
                     wrapped_variant.reason = "Variant is ambiguous."
-                    excluded_wrapped_variants.append(wrapped_variant)
+                    excluded_wrapped_variants.append((wrapped_variant, panel_entry))
                     variant_summary_stats["variant_ambigious"] += 1
                     variant_summary_stats["variant_removed_from_panel"] += 1
                     continue
             
-                # CHECK RECODE CONDITION
-                panel_entry = panel[wrapped_variant.key]
+                # CHECK RECODE CONDITION, IF SHOULD RECODE, THEN RECODE
                 if panel_entry.should_recode(wrapped_variant.variant):
-                    swap_variant_ref_and_alt(wrapped_variant.variant)
+                    wrapped_variant.variant = swap_variant_ref_and_alt(wrapped_variant.variant)
                     wrapped_variant.status = "updated"
                     wrapped_variant.reason = "REF/ALT swapped."
                     wrapped_variant.variant.INFO["UPD"] = 1
-                    included_wrapped_variants.append(wrapped_variant)
-                    variant_summary_stats["variant_added_to_panel"] += 1
 
                 # CHECK IF SHOULD_FLIP AND CAN_FLIP THEN FLIP
                 if panel_entry.should_flipstrand(wrapped_variant.variant) and correct_complement:
-                    flip_variant_strand(
-                        variant=variant, 
+                    wrapped_variant.variant = flip_variant_strand(
+                        variant=wrapped_variant.variant, 
                         snp_reference=panel_entry, 
                         bp_complements=CONST.BP_COMPLEMENTS
                     )
                     wrapped_variant.status = "updated"
-                    wrapped_variant.reason = "Strand flipped. REF/ ALT not in panel nucleotides."
+                    wrapped_variant.reason = wrapped_variant.reason + "Strand flipped. REF/ ALT not in panel nucleotides."
                     wrapped_variant.variant.INFO["UPD"] = 1
-                    included_wrapped_variants.append(wrapped_variant)
-                    variant_summary_stats["variant_added_to_panel"] += 1
                 
-                # IF AFTER THE ABOVE CONDITIONAL INTERVENTIONS, STILL NOT SYNCED, THEN REJECT IT
+                # IF AFTER THE ABOVE CONDITIONAL INTERVENTIONS, STILL NOT SYNCED, THEN SKIP IT
                 if not panel_entry.ref_alt_alleles_synced(wrapped_variant.variant) and drop_encoding_failures:
                     wrapped_variant.status = "removed"
                     wrapped_variant.reason = "Insufficient information to flip strand."
                     variant_summary_stats["variant_removed_from_panel"] += 1
-                    excluded_wrapped_variants.append(wrapped_variant)
+                    excluded_wrapped_variants.append((wrapped_variant, panel_entry))
                     continue
-
-            else:
-                variant_summary_stats["variant_added_to_panel"] += 1
             
+            # If after all checks, still valid, then include.
+            variant_summary_stats["variant_added_to_panel"] += 1
             included_wrapped_variants.append(wrapped_variant)
-            wrapped_variant.status = wrapped_variant.status + " and included."
+            wrapped_variant.status = wrapped_variant.status + "Included."
             wrapped_variant, record = augment_revised_variant(
                 wrapped_variant, panel_entry=panel_entry
             )
@@ -270,11 +269,16 @@ def encode_variants_to_panel(
     revision_records = pd.DataFrame(revision_records)
     revision_records = revision_records.sort_values(by="updated", ascending=False)
 
-    return included_wrapped_variants, excluded_wrapped_variants, \
+    exclusion_records = [format_revision_record(wrapped_variant, panel_entry) for wrapped_variant, panel_entry in excluded_wrapped_variants]
+    exclusion_records = pd.DataFrame(exclusion_records)
+
+    return included_wrapped_variants, exclusion_records, \
         variant_summary_stats, revision_records
 
 def augment_revised_variant(wrapped_variant:vw.VariantWrapper, panel_entry:snpr.SNPReference):
     v_freq = wrapped_variant.variant.INFO.get("AF")
+
+    revision_record = format_revision_record(wrapped_variant, panel_entry)
 
     if panel_entry == None:
         panel_entry = snpr.get_empty_snp_reference()
@@ -290,7 +294,22 @@ def augment_revised_variant(wrapped_variant:vw.VariantWrapper, panel_entry:snpr.
         
         wrapped_variant.variant.INFO["MAF"] = \
             v_freq if v_freq < 0.5 else 1 - v_freq
+        
+        revision_record["updated_freq"] = v_freq
+        revision_record["MAF"] =  wrapped_variant.variant.INFO.get("MAF")
+        revision_record["MISS"] =  wrapped_variant.variant.INFO.get("MISS")
+        revision_record["PFD"] =  wrapped_variant.variant.INFO.get("PFD")
+        revision_record["updated"] =  wrapped_variant.variant.INFO.get("UPD")
 
+    return wrapped_variant, revision_record
+
+def export_revised_vcf(variants:list, vcf_template, output_filename:str):
+    w = Writer(output_filename, vcf_template)
+    for wrapped_variant in variants:
+        w.write_record(wrapped_variant.variant)
+    w.close()
+
+def format_revision_record(wrapped_variant, panel_entry):
     revision_record = {
         "variant_id": wrapped_variant.variant.ID,
         "chromosome":wrapped_variant.variant.CHROM, 
@@ -302,27 +321,28 @@ def augment_revised_variant(wrapped_variant:vw.VariantWrapper, panel_entry:snpr.
         "ref_allele": wrapped_variant.variant.REF,
         "alt_allele": wrapped_variant.variant.ALT[0],
         "alt_allele_freq": wrapped_variant.variant.aaf,
-        "panel_chr": panel_entry.chr,
-        "panel_loc": panel_entry.position,
-        "panel_ref": panel_entry.ref_allele,
-        "panel_alt": panel_entry.alt_allele,
-        "panel_freq": panel_entry.alt_allele_frequency,
-        "updated_freq": v_freq,
-        "MAF": wrapped_variant.variant.INFO.get("MAF"),
-        "MISS": wrapped_variant.variant.INFO.get("MISS"),
-        "PFD": wrapped_variant.variant.INFO.get("PFD"),
-        "updated": wrapped_variant.variant.INFO.get("UPD"),
         "status":wrapped_variant.status,
         "reason":wrapped_variant.reason
     }
 
-    return wrapped_variant, revision_record
+    if panel_entry:
+        revision_record["panel_chr"] = panel_entry.chr
+        revision_record["panel_loc"] = panel_entry.position
+        revision_record["panel_ref"] = panel_entry.ref_allele
+        revision_record["panel_alt"] = panel_entry.alt_allele
+        revision_record["panel_freq"] = panel_entry.alt_allele_frequency
+    else:
+        revision_record["panel_chr"] = ""
+        revision_record["panel_loc"] = ""
+        revision_record["panel_ref"] = ""
+        revision_record["panel_alt"] = ""
+        revision_record["panel_freq"] = ""
+    
+    revision_record["PFD"] = ""
+    revision_record["MISS"] = ""
+    revision_record["MAF"] = ""
 
-def export_revised_vcf(variants:list, vcf_template, output_filename:str):
-    w = Writer(output_filename, vcf_template)
-    for wrapped_variant in variants:
-        w.write_record(wrapped_variant.variant)
-    w.close()
+    return revision_record
 
 def main():
     print("Starting...")
@@ -334,6 +354,8 @@ def main():
     output_vcf_filename = os.path.join(output_dir, args["OutputVCF"])
     revision_summary_filename = "frq_encoding_changes_summary.csv"
     revision_summary_filename = os.path.join(output_dir, revision_summary_filename)
+    exclusion_summary_filename = "frq_encoding_exclusions_summary.csv"
+    exclusion_summary_filename = os.path.join(output_dir, exclusion_summary_filename)
     summary_plot_filename = "freq_encode_snps_summary_plot.png"
     summary_plot_filename = os.path.join(output_dir, summary_plot_filename)
     reference_panel = args["ReferencePanel"]
@@ -344,7 +366,7 @@ def main():
     max_ambigious_threshold = args["AmbiguousThresholdMax"]
     correct_complement = args["FixComplementRefAlt"]
     drop_encoding_failures = args["DropEncodingFailures"]
-    outlier_threshold = args["OutlierThreshold"]
+    outlier_threshold = args["OutlierThreshold"] # outlier_threshold used in plotting. Currently not used.
 
     drop_ambiguous_settings = {
         "drop_ambiguous_flag":drop_ambiguous_flag, 
@@ -365,7 +387,7 @@ def main():
     vcf = augment_vcf_header(vcf=vcf)
 
     # Encode VCF to Reference Panel
-    included_wrapped_variants, excluded_wrapped_variants, \
+    included_wrapped_variants, exclusion_records, \
         variant_summary_stats, revision_records = \
         encode_variants_to_panel(
             vcf, 
@@ -377,6 +399,7 @@ def main():
 
     # EXPORT REPORTING 
     revision_records.to_csv(revision_summary_filename, index=None)
+    exclusion_records.to_csv(exclusion_summary_filename, index=None)
 
     # GENERATE & EXPORT SUMMARY PLOTTING
     pass
