@@ -91,7 +91,7 @@ snakemake --cores 8 --use-conda --conda-frontend conda --keep-going
 ```
 
 # Output
-The phased Hap/Samp files for each of N partitions are output into the ``Output/Liechti2023/KIR_IMP_READY``, e.g.:
+The phased Hap/Samp files for each of N partitions are output into the ``Output/{YOUR_PROJECT_NAME}/KIR_IMP_READY``, e.g.:
 
 * datafile.chr19.53_to_56mb.ac.phased.1.hap 
 * datafile.chr19.53_to_56mb.ac.phased.1.sample 
