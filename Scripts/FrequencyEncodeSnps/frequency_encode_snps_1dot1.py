@@ -322,7 +322,8 @@ def format_revision_record(wrapped_variant, panel_entry) -> dict:
         "alt_allele": wrapped_variant.variant.ALT[0],
         "alt_allele_freq": wrapped_variant.variant.aaf,
         "status":wrapped_variant.status,
-        "reason":wrapped_variant.reason
+        "reason":wrapped_variant.reason,
+        "updated":wrapped_variant.variant.INFO.get("UPD")
     }
 
     if panel_entry:

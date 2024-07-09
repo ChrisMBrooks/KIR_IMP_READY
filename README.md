@@ -83,6 +83,8 @@ The ``pipeline.config.json`` file is a simple high level JSON file containing co
 }
 ```
 
+> NB - KIR_IMP_READY relies on SHAPEIT5 and utilises a reference panel obtained from [the shapeit5 github repo](https://github.com/odelaneau/shapeit5/tree/main/resources/maps/b37). 
+
 # Run
 To run the pipeline, first activate the snakemake conda environment, ``snakemake_env`` and then run the following command:  
 
